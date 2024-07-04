@@ -15,6 +15,8 @@ public:
     int TurnOn();
     int SwitchOff();
     void MoveToPosition(const int position);
+    int GetDrivePosition();
+    bool InPosition();
 };
 
 #endif /* drive_setup_hpp */
