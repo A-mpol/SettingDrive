@@ -12,8 +12,10 @@ uint16_t Drive::ChangeValueRegister(const uint16_t value_register, const int bit
     uint16_t modified_register_value = value_register;
     if (bit_value == 1)
         modified_register_value = value_register | tmp;
-    else if (bit_value == 0)
+    else if (bit_value == 0) {
+        tmp = ~tmp;
         modified_register_value = value_register & tmp;
+    }
     return modified_register_value;
 }
 
@@ -115,3 +117,22 @@ void Drive::GoToPosition() {
     }
 }
 
+int Drive::GetDrivePosition() {
+    uint16_t data[2];
+    int success;
+    int drive_position;
+    success = modbus_read_registers(drive, 1923, 2, data);
+    if (success == -1) {
+        std::cerr << "Modbus read register 508 failed: " << modbus_strerror(errno) << std::endl;
+        return -1;
+    }
+    drive_position = (data[1] << 16) + data[0];
+    return drive_position;
+}
+
+bool Drive::InPosition() {
+    uint16_t data[1];
+    int success;
+    success = modbus_read_registers(drive, 1549, 1, data);
+    return (data[0] == 11);
+}
